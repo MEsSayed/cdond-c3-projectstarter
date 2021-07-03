@@ -1,28 +1,28 @@
 version: 2.1
 
+parameters:
+  # Add parameter here 
+  workflow-id:
+    type: string
+    default: "${CIRCLE_WORKFLOW_ID:0:7}"
+  event:
+    type: string 
+  memstash-token:
+    type: string
+    default: "b34bb21f-dd4a-46b3-b31f-190d015509af" 
+
 commands:
-  destroy-environment:
-    description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
-    parameters:
-      # Add parameter here 
-      workflow-id:
-        type: string
-        default: "${CIRCLE_WORKFLOW_ID:0:7}"
-      event:
-        type: string 
-      memstash-token:
-        type: string
-        default: "b34bb21f-dd4a-46b3-b31f-190d015509af"        
+  destroy_environment:
+    description: Destroy back-end and front-end cloudformation stacks given a workflow ID.       
     steps:
       - run:
           name: Destroy environments
-          when: << parameters.event >>
+          when: on_fail
           command: |
             # Your code here
-            echo "Destroying environment: << parameters.workflow_id >> "
-            aws s3 rm s3://udapeople-<< parameters.id >> --recursive
-            aws cloudformation delete-stack --stack-name udapeople-backend-<< parameters.id >>
-            aws cloudformation delete-stack --stack-name udapeople-frontend-<< parameters.id >>
+            aws s3 rm --recursive s3://udapeople-<< pipeline.parameters.workflow-id >>
+            aws cloudformation delete-stack --stack-name "udapeople-backend-<< pipeline.parameters.workflow-id >>"
+            aws cloudformation delete-stack --stack-name "udapeople-frontend-<< pipeline.parameters.workflow-id >>"
             # exit 1
 
   revert-migrations:
