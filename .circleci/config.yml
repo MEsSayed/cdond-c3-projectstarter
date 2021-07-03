@@ -386,7 +386,7 @@ jobs:
       # Here's where you will add some code to rollback on failure  
       - destroy_environment
           
-cleanup:
+  cleanup:
     docker:
       # Docker image here
       - image: amazon/aws-cli
