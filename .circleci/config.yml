@@ -244,96 +244,164 @@ jobs:
   run-migrations:
     docker:
       # Docker image here that supports NodeJS
+      docker:
+        - image: circleci/node:13.8.0
+      
     steps:
       # Checkout code from git
+      - checkout
       - run:
           name: Run migrations
           command: |
             # Your code here
+            cd  ./backend
+            npm run migrations > migration_status
             #exit 1
       - run:
           name: Send migration results to memstash
           command: |
             # Your code here
+            cd ./backend
+            
             #exit 1
      # Here's where you will add some code to rollback on failure      
-
+      - destroy_environment:
+          id: ${CIRCLE_WORKFLOW_ID:0:7}
+          when: on_fail
+          
   deploy-frontend:
     docker:
       # Docker image here that supports AWS CLI
+      - image: amazon/aws-cli
     steps:
       # Checkout code from git
+      - checkout
       - run:
           name: Install dependencies
           command: |
             # your code here
+            cd frontend
+            sudo npm install webpack-dev-server -g
+            sudo npm install
       - run:
           name: Get backend url
           command: |
             # your code here
+            export BACKEND_IP=$(sed -n 2p .circleci/ansible/inventory.txt)
             export API_URL="http://${BACKEND_IP}:3030"
-            echo "${API_URL}"
+            echo ENVIRONMENT=production > "frontend/.env"
+            echo NODE_ENV=production >> "frontend/.env"
+            echo API_URL=$API_URL >> "frontend/.env"
+            echo $API_URL            
       - run:
           name: Deploy frontend objects
           command: |
             # your code here
+            aws s3 cp --recursive frontend/dist "s3://udapeople-<< pipeline.parameters.workflow-id >>"
       # Here's where you will add some code to rollback on failure      
-                    
+      - destroy_environment:
+          id: ${CIRCLE_WORKFLOW_ID:0:7}
+          when: on_fail
+          
   deploy-backend:
     docker:
       # Docker image here that supports Ansible
+      - image: python:3.7-alpine3.11
     steps:
       # Checkout code from git
+      - checkout
       # Add ssh keys with fingerprint
+      - add_ssh_keys:
+          fingerprints: ["06:7c:db:71:49:2f:03:36:60:08:d2:fd:33:6f:17:d3"]      
       # attach workspace
+          at: ~/
       - run:
           name: Install dependencies
           command: |
             # your code here
+            apk add --update ansible openssh-client tar gzip
       - run:
           name: Deploy backend
           command: |
             # your code here
+            cd /home
+            tar czf backend.tar.gz -P /home/circleci/project/backend/dist            
       # Here's where you will add some code to rollback on failure  
-
+      - destroy_environment:
+          id: ${CIRCLE_WORKFLOW_ID:0:7}
+          when: on_fail
+          
   smoke-test:
     docker:
       # Lightweight Docker image 
+      - image: python:3.7-alpine3.11      
     steps:
       # Checkout code from git
+      - checkout
       - run:
           name: Install dependencies
           command: |
             # your code here
+            apk add --update curl            
       - run:
           name: Get backend url
           command: |
             # your code here
+            export BACKEND_URL=$(sed -n 2p .circleci/ansible/inventory.txt)
       - run:
           name: Backend smoke test.
           command: |
             # your code here
+            if curl -s https://${BACKEND_URL}:3030/api/status
+            then
+            return 1
+            else
+            return 0
+            fi            
       - run:
           name: Frontend smoke test.
           command: |
             # your code here
+            URL="http://udapeople-<< pipeline.parameters.workflow-id >>.s3-website-eu-west-3.amazonaws.com"
+            echo $URL
+            if curl -s ${URL} | grep "Welcome"
+            then
+            return 1
+            else
+            return 0
+            fi
       # Here's where you will add some code to rollback on failure  
-
+      - destroy_environment:
+          id: ${CIRCLE_WORKFLOW_ID:0:7}
+          when: on_fail
+          
   cloudfront-update:
     docker:
       # Docker image here that supports AWS CLI
+      - image: python:3.7-alpine3.11
     steps:
       # Checkout code from git
+      - checkout
       - run:
           name: Install dependencies
           command: |
             # your code here
+            apk add --update py3-pip && pip3 install --upgrade pip && pip3 install awscli
+            apk add --update curl
       - run:
           name: Update cloudfront distribution
           command: |
             # your code here
+            aws cloudformation deploy \
+              --template-file .circleci/files/cloudfront.yml \
+              --stack-name "udapeople-cloudfront" \
+              --parameter-overrides WorkflowID="<< pipeline.parameters.workflow-id >>" \
+              --tags project=udapeople            
       # Here's where you will add some code to rollback on failure  
-
+      - destroy_environment:
+          id: ${CIRCLE_WORKFLOW_ID:0:7}
+          when: on_fail
+          
 cleanup:
     docker:
       # Docker image here
