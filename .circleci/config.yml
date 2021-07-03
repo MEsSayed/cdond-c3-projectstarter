@@ -191,7 +191,8 @@ jobs:
           command: |
             # Your code here
             aws ec2 describe-instances \
-              --filters "Name=tag:project,Values=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+              # --filters "Name=tag:project,Values=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --filters "Name=tag:project,Values=udapeople" \
               --query 'Reservations[*].Instances[*].PublicIpAddress' \
               --output text >> .circleci/ansible/inventory.txt
             cat .circleci/ansible/inventory.txt         
@@ -201,9 +202,7 @@ jobs:
           paths:
             - project/.circleci/ansible/inventory.txt
       # Here's where you will add some code to rollback on failure      
-      - destroy_environment:
-          id: ${CIRCLE_WORKFLOW_ID:0:7}
-          when: on_fail        
+      - destroy_environment       
 
 
   configure-infrastructure:
@@ -237,9 +236,7 @@ jobs:
             ansible-playbook -i inventory configure-server.yaml            
             #exit 1
       # Here's where you will add some code to rollback on failure  
-      - destroy_environment:
-          id: ${CIRCLE_WORKFLOW_ID:0:7}
-          when: on_fail      
+      - destroy_environment
 
   run-migrations:
     docker:
@@ -262,9 +259,7 @@ jobs:
             cd ./backend           
             #exit 1
      # Here's where you will add some code to rollback on failure      
-      - destroy_environment:
-          id: ${CIRCLE_WORKFLOW_ID:0:7}
-          when: on_fail
+      - destroy_environment
           
   deploy-frontend:
     docker:
@@ -296,9 +291,7 @@ jobs:
             # your code here
             aws s3 cp --recursive frontend/dist "s3://udapeople-<< pipeline.parameters.workflow-id >>"
       # Here's where you will add some code to rollback on failure      
-      - destroy_environment:
-          id: ${CIRCLE_WORKFLOW_ID:0:7}
-          when: on_fail
+      - destroy_environment
           
   deploy-backend:
     docker:
@@ -324,9 +317,7 @@ jobs:
             cd /home
             tar czf backend.tar.gz -P /home/circleci/project/backend/dist            
       # Here's where you will add some code to rollback on failure  
-      - destroy_environment:
-          id: ${CIRCLE_WORKFLOW_ID:0:7}
-          when: on_fail
+      - destroy_environment
           
   smoke-test:
     docker:
@@ -368,9 +359,7 @@ jobs:
             return 0
             fi
       # Here's where you will add some code to rollback on failure  
-      - destroy_environment:
-          id: ${CIRCLE_WORKFLOW_ID:0:7}
-          when: on_fail
+      - destroy_environment
           
   cloudfront-update:
     docker:
@@ -395,9 +384,7 @@ jobs:
               --parameter-overrides WorkflowID="<< pipeline.parameters.workflow-id >>" \
               --tags project=udapeople            
       # Here's where you will add some code to rollback on failure  
-      - destroy_environment:
-          id: ${CIRCLE_WORKFLOW_ID:0:7}
-          when: on_fail
+      - destroy_environment
           
 cleanup:
     docker:
