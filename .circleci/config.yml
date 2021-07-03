@@ -101,7 +101,7 @@ jobs:
       # Your job code here
       - run:
           name: Run frontend test
-          command:
+          command: |
             cd frontend
             npm run test
                 
@@ -118,7 +118,7 @@ jobs:
       # Your job code here
       - run:
           name: Run backend test
-          command:
+          command: |
             cd backend
             npm run test
             
@@ -135,7 +135,7 @@ jobs:
       # Your job code here
       - run:
           name: Scan fronend dependencies
-          command:
+          command: |
             cd frontend
             npm install
             npm audit --audit-level=critical || true     
@@ -153,7 +153,7 @@ jobs:
       # Your job code here
       - run:
           name: Scan fronend dependencies
-          command:
+          command: |
             cd backend
             npm install
             npm audit --audit-level=critical || true
