@@ -7,8 +7,12 @@ commands:
       # Add parameter here 
       workflow_id:
         type: string
+        default: "${CIRCLE_WORKFLOW_ID:0:7}"
       event:
-        type: string        
+        type: string 
+      memstash-token:
+        type: string
+        default: "b34bb21f-dd4a-46b3-b31f-190d015509af"        
     steps:
       - run:
           name: Destroy environments
