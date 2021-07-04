@@ -24,7 +24,7 @@ commands:
           when: on_fail
           command: |
             # Your code here
-            echo "Destroying environment: <<parameters.workflow-id>> "
+            echo "Destroying environment: <<pipeline.parameters.workflow-id>> "
             aws cloudformation delete-stack --stack-name "udapeople-backend-<< pipeline.parameters.workflow-id >>"
             aws s3 rm s3://udapeople-<< pipeline.parameters.workflow-id >> --recursive
             aws cloudformation delete-stack --stack-name "udapeople-frontend-<< pipeline.parameters.workflow-id >>"
