@@ -194,7 +194,9 @@ jobs:
           name: Add back-end ip to ansible inventory
           command: |
             # Your code here
-            aws ec2 describe-instances \
+            aws ec2 describe-instances --region us-east-1 \
+              --aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID \
+              --aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY \
               # --filters "Name=tag:project,Values=udapeople-backend-<< pipeline.parameters.workflow-id >>" \
               --filters "Name=tag:project,Values=udapeople" \
               --query 'Reservations[*].Instances[*].PublicIpAddress' \
