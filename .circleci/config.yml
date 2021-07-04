@@ -184,7 +184,9 @@ jobs:
       - run:
           name: Ensure front-end infrastructure exist
           command: |
-            aws cloudformation deploy \
+            aws cloudformation deploy --region us-east-1 \
+              --aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID \
+              --aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY \
               --template-file .circleci/files/frontend.yml \
               --tags project=udapeople \
               --stack-name "udapeople-frontend-<< pipeline.parameters.workflow-id >>" \
