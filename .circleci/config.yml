@@ -169,39 +169,53 @@ jobs:
             
   deploy-infrastructure:
     docker:
-      - image: cimg/base:2020.01
+      # Docker image here that supports AWS CLI
+      - image: amazon/aws-cli
     steps:
+      # Checkout code from git
       - checkout
-      - aws-cli/setup
+      - run: yum -y install tar gzip
       - run:
           name: Ensure back-end infrastructure exists
           command: |
-            aws cloudformation deploy \
+            aws cloudformation deploy --region us-east-1 \
+              --aws configure set aws_access_key_id ${AWS_ACCESS_KEY_ID} \
+              --aws configure set aws_secret_access_key ${AWS_SECRET_ACCESS_KEY} \
               --template-file .circleci/files/backend.yml \
+              --tags project=udapeople-backend-<< pipeline.parameters.workflow-id >> \
               --stack-name "udapeople-backend-<< pipeline.parameters.workflow-id >>" \
-              --parameter-overrides ID="<< pipeline.parameters.workflow-id >>" \
-              --tags project=udapeople
+              --parameter-overrides ID="<< pipeline.parameters.workflow-id >>"
+              #exit 1
       - run:
           name: Ensure front-end infrastructure exist
           command: |
-            aws cloudformation deploy \
+            aws cloudformation deploy --region us-east-1 \
+              --aws configure set aws_access_key_id ${AWS_ACCESS_KEY_ID} \
+              --aws configure set aws_secret_access_key ${AWS_SECRET_ACCESS_KEY} \
               --template-file .circleci/files/frontend.yml \
+              --tags project=udapeople-<< pipeline.parameters.workflow-id >> \
               --stack-name "udapeople-frontend-<< pipeline.parameters.workflow-id >>" \
-              --parameter-overrides ID="<< pipeline.parameters.workflow-id >>" \
-              --tags project=udapeople
+              # --parameter-overrides ID="<< pipeline.parameters.workflow-id >>"  
+              #exit 1
       - run:
           name: Add back-end ip to ansible inventory
           command: |
-            aws ec2 describe-instances \
-              --query 'Reservations[*].Instances[*].PublicIpAddress' \
+            # Your code here
+            aws ec2 describe-instances --region us-east-1 \
+              --aws configure set aws_access_key_id ${AWS_ACCESS_KEY_ID} \
+              --aws configure set aws_secret_access_key ${AWS_SECRET_ACCESS_KEY} \
+              # --filters "Name=tag:project,Values=udapeople-backend-<< pipeline.parameters.workflow-id >>" \
               --filters "Name=tag:project,Values=udapeople" \
+              --query 'Reservations[*].Instances[*].PublicIpAddress' \
               --output text >> .circleci/ansible/inventory.txt
-            cat .circleci/ansible/inventory.txt
+            cat .circleci/ansible/inventory.txt         
+            #exit 1
       - persist_to_workspace:
           root: ~/
           paths:
             - project/.circleci/ansible/inventory.txt
-      - destroy_environment   
+      # Here's where you will add some code to rollback on failure      
+      - destroy_environment       
 
 
   configure-infrastructure:
