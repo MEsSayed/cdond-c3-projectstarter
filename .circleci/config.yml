@@ -178,9 +178,11 @@ jobs:
       - run:
           name: Ensure back-end infrastructure exists
           command: |
-            aws cloudformation deploy \
+            aws cloudformation deploy --region us-east-1 \
+              --aws configure set aws_access_key_id ${AWS_ACCESS_KEY_ID} \
+              --aws configure set aws_secret_access_key ${AWS_SECRET_ACCESS_KEY} \
               --template-file .circleci/files/backend.yml \
-              --tags project=udapeople \
+              --tags project=udapeople-backend-<< pipeline.parameters.workflow-id >> \
               --stack-name "udapeople-backend-<< pipeline.parameters.workflow-id >>" \
               --parameter-overrides ID="<< pipeline.parameters.workflow-id >>"
               --tags project=udapeople
@@ -192,7 +194,7 @@ jobs:
               --aws configure set aws_access_key_id ${AWS_ACCESS_KEY_ID} \
               --aws configure set aws_secret_access_key ${AWS_SECRET_ACCESS_KEY} \
               --template-file .circleci/files/frontend.yml \
-              --tags project=udapeople \
+              --tags project=udapeople-<< pipeline.parameters.workflow-id >> \
               --stack-name "udapeople-frontend-<< pipeline.parameters.workflow-id >>" \
               --tags project=udapeople
               # --parameter-overrides ID="<< pipeline.parameters.workflow-id >>"  
