@@ -49,9 +49,3 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub backend-${ID}
-          
-  InstanceEIPAssociation:
-    Type: AWS::EC2::EIPAssociation
-    Properties: 
-      EIP: !Ref NatGateway1EIP
-      InstanceId: !Ref EC2Instance
