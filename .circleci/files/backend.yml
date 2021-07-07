@@ -64,4 +64,4 @@ Resources:
               - Key: Name
                 Value: !Sub backend-${ID}
         IamInstanceProfile:
-          Arn: arn:aws:iam::830601311856:user/udacity
+          Arn: arn:aws:iam::<830601311856>:user/udacity
