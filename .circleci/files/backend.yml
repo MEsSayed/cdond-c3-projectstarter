@@ -47,10 +47,10 @@ Resources:
       #    Value: !Sub backend-${ID}
       
   RequiredTagsLaunchTemplate:
-    Type: AWS::EC2::LaunchTemplate
+    Type: 'AWS::EC2::LaunchTemplate'
     Properties:
       LaunchTemplateData:
-        TagSpecifications
+        TagSpecifications:
           - ResourceType: instance
             Tags:
               - Key: Env
