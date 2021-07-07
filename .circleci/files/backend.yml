@@ -63,5 +63,5 @@ Resources:
             Tags:
               - Key: Name
                 Value: !Sub backend-${ID}
-        IamInstanceProfile:
-          Arn: arn:aws:iam::<830601311856>:user/udacity
+        #IamInstanceProfile:
+        #  Arn: arn:aws:iam::830601311856:user/udacity
