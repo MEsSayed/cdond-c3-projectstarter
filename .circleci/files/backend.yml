@@ -51,7 +51,7 @@ Resources:
     Properties:
       LaunchTemplateData:
         TagSpecifications
-          - ResourceType: Volume  
-        Tags:
-          - Key: Env
-            Value: Dev
+          - ResourceType: instance
+            Tags:
+              - Key: Env
+                Value: Dev
