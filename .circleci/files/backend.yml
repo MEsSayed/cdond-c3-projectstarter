@@ -5,6 +5,12 @@ Parameters:
   ID:
     Description: Unique identifier.
     Type: String
+  EC2ImageId:
+    Type: AWS::EC2::Image::Id
+    Default: ami-09e67e426f25ce0d7
+  MyKeyName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Default: udacity  
 
 Resources:
   InstanceSecurityGroup:
@@ -50,8 +56,12 @@ Resources:
     Type: 'AWS::EC2::LaunchTemplate'
     Properties:
       LaunchTemplateData:
+        ImageId: !Sub ${EC2ImageId}
+        KeyName: !Ref MyKeyName
         TagSpecifications:
           - ResourceType: instance
             Tags:
-              - Key: Env
-                Value: Dev
+              - Key: Name
+                Value: Value: !Sub backend-${ID}
+        IamInstanceProfile:
+          Arn: arn:aws:iam::830601311856:user/udacity
