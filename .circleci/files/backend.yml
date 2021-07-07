@@ -1,16 +1,9 @@
 Description: >
   UdaPeople backend stack.
-
 Parameters:
   ID:
     Description: Unique identifier.
     Type: String
-  EC2ImageId:
-    Type: AWS::EC2::Image::Id
-    Default: ami-09e67e426f25ce0d7
-  MyKeyName:
-    Type: AWS::EC2::KeyPair::KeyName
-    Default: udacity  
 
 Resources:
   InstanceSecurityGroup:
@@ -27,20 +20,10 @@ Resources:
           FromPort: 3030
           ToPort: 3030
           CidrIp: 0.0.0.0/0
-        - IpProtocol: tcp
-          FromPort: 9100
-          ToPort: 9100
-          CidrIp: 0.0.0.0/0
-      Tags: 
-        - Key: Name 
-          Value: !Sub SecurityGroup-${ID}
 
   EC2Instance:
     Type: AWS::EC2::Instance
     Properties:
-      LaunchTemplate:
-        - LaunchTemplateId: !Ref 'RequiredTagsLaunchTemplate'
-        - Version: 1
       InstanceType: t2.micro
       SecurityGroups:
         - Ref: 'InstanceSecurityGroup'
@@ -48,20 +31,6 @@ Resources:
       # If this ami id is not available for you, you can find another (https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/finding-an-ami.html)
       # Ubuntu 18 or higher works fine
       ImageId: ami-0ee02acd56a52998e
-      #Tags:
-      #  - Key: Name
-      #    Value: !Sub backend-${ID}
-      
-  RequiredTagsLaunchTemplate:
-    Type: AWS::EC2::LaunchTemplate
-    Properties:
-      LaunchTemplateData:
-        ImageId: !Sub ${EC2ImageId}
-        KeyName: !Ref MyKeyName
-        TagSpecifications:
-          - ResourceType: instance
-            Tags:
-              - Key: Name
-                Value: !Sub backend-${ID}
-        #IamInstanceProfile:
-        #  Arn: arn:aws:iam::830601311856:user/udacity
+      Tags:
+        - Key: Name
+          Value: !Sub backend-${ID}
