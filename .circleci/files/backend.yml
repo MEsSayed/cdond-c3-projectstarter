@@ -32,6 +32,9 @@ Resources:
   EC2Instance:
     Type: AWS::EC2::Instance
     Properties:
+      LaunchTemplate:
+        - LaunchTemplateId: !Ref RequiredTagsLaunchTemplate
+        - Version: 1
       InstanceType: t2.micro
       SecurityGroups:
         - Ref: InstanceSecurityGroup
@@ -42,3 +45,13 @@ Resources:
       #Tags:
       #  - Key: Name
       #    Value: !Sub backend-${ID}
+      
+  RequiredTagsLaunchTemplate:
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+      LaunchTemplateData:
+        TagSpecifications
+          - ResourceType: Volume  
+        Tags:
+          - Key: Env
+            Value: Dev
