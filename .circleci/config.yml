@@ -180,6 +180,7 @@ jobs:
       - run:
           name: Ensure front-end infrastructure exist
           command: |
+            sudo chmod 0777 .circleci/files/udacity.pem \
             aws cloudformation deploy \
               --template-file .circleci/files/frontend.yml \
               --tags project=udapeople \
