@@ -24,9 +24,6 @@ Resources:
   EC2Instance:
     Type: AWS::EC2::Instance
     Properties:
-      LaunchTemplate:
-        LaunchTemplateId: !Ref RequiredTagsLaunchTemplate
-        Version: 1    
       InstanceType: t2.micro
       SecurityGroups:
         - Ref: InstanceSecurityGroup
