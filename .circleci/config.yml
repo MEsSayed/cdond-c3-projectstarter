@@ -227,7 +227,7 @@ jobs:
           command: |
             # Your code here
             apk add --update ansible
-            cat .circleci/ansible/inventory.txt
+            # cat .circleci/ansible/inventory.txt
             #exit 1
       - run:
           name: Configure server
