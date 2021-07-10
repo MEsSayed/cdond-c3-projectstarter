@@ -1,9 +1,22 @@
   
+- name: "upgrade packages."
+  become: true
+  apt:
+    upgrade: "yes"
+
+- name: "install dependencies."
+  become: true
+  apt:
+    name: ["nodejs", "npm"]
+    state: latest
+    update_cache: yes
+
 - name: "install node 12.X"
   shell: |
     curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
     sudo apt -y upgrade
     sudo apt install -y nodejs
+
 - name: "install pm2 by npm"
   become: true
   npm:
@@ -11,7 +24,7 @@
     global: yes
     production: yes
     state: present
-
+    
 - name: "copy files from CircleCI to server"
   copy:
     src: /root/project/backend
@@ -20,4 +33,4 @@
 - name: "install package dependencies"
   shell: |
     cd /home/ubuntu/backend    
-    npm install 
+    npm install
