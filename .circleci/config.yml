@@ -225,18 +225,36 @@ jobs:
           command: |
             # Your code here
             apk add --update ansible
-            ansible --version
+            cat .circleci/ansible/inventory.txt
             #exit 1
       - run:
           name: Configure server
           command: |
             # Your code here
-            cd .circleci/ansible
+            echo ENVIRONMENT=production > "backend/.env"
+            echo TYPEORM_CONNECTION=postgres >> "backend/.env"
+            echo TYPEORM_ENTITIES=./src/modules/domain/**/*.entity.ts >> "backend/.env"
+            echo TYPEORM_MIGRATIONS=./src/migrations/*.ts >> "backend/.env"
+            echo TYPEORM_MIGRATIONS_DIR=./src/migrations >> "backend/.env"
+            echo NODE_ENV=production >> "backend/.env"
+            echo TYPEORM_HOST=$TYPEORM_HOST >> "backend/.env"
+            echo TYPEORM_PORT=$TYPEORM_PORT >> "backend/.env"
+            echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> "backend/.env"
+            echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> "backend/.env"
+            echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> "backend/.env"            
+            # cd .circleci/ansible
             # pwd &&
             # ls -la
-            cat inventory
-            ansible-playbook -i inventory configure-server.yaml            
+            # cat inventory
+            ansible-playbook \
+              -i .circleci/ansible/inventory.txt \
+              .circleci/ansible/configure-server.yml          
             #exit 1
+      - run:
+          name: Install AWS CLI for rollback
+          when: on_fail
+          command: |
+            apk add --update py3-pip && pip3 install --upgrade pip && pip3 install awscli            
       # Here's where you will add some code to rollback on failure  
       - destroy_environment
 
