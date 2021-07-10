@@ -286,9 +286,6 @@ jobs:
             cat migration.log
             migration_status=$(cat migration.log | grep -c "has been executed successfully")
             if [ $migration_status > 0 ]; then exit 0; else exit 1; fi;
-      - run:
-          name: Send migration results to memstash
-          command: |
             curl -H "Content-Type: text/plain" \
               -H "token: << pipeline.parameters.memstash-token >>" \
               --request PUT --data "1" \
