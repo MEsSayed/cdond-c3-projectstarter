@@ -200,9 +200,11 @@ jobs:
           no_output_timeout: 30m
           
       - persist_to_workspace:
-          root: ~/
+          root: .circleci/ansible
           paths:
-            - project/.circleci/ansible/inventory.txt
+            - inventory.txt
+      - attach_workspace:
+          at: /tmp/.circleci/ansible
       # Here's where you will add some code to rollback on failure      
       - destroy_environment       
 
