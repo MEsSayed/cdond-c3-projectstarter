@@ -272,16 +272,17 @@ jobs:
           command: |
             cd backend
             npm install
-            npm run migrations > migration_${CIRCLE_WORKFLOW_ID}.txt
-            cat migration_${CIRCLE_WORKFLOW_ID}.txt
+            touch migration.txt
+            npm run migrations >> migration.txt
+            cat migration.txt
           no_output_timeout: 30m
       - run:
           name: Send migration results to memstash
           command: |
             cd backend
-            cat migration_${CIRCLE_WORKFLOW_ID}.txt
+            cat migration.txt
             result=0
-            if grep -q "has been executed successfully" migration_${CIRCLE_WORKFLOW_ID}.txt
+            if grep -q "has been executed successfully" migration.txt
             then
               result=1
             fi
@@ -290,6 +291,14 @@ jobs:
             --request PUT \
             --data ${result} https://api.memstash.io/values/migration
             echo ${result}
+          no_output_timeout: 30m 
+      - run:
+          name: LogOnFail
+          when: on_fail
+          command: |
+            cat /home/circleci/.npm/_logs/*-debug.log
+            ls -la
+            cat backend/migration.txt          
       - revert-migrations
       - destroy_environment
           
