@@ -310,14 +310,12 @@ jobs:
       # Checkout code from git
       - checkout
       - attach_workspace:
-          at: ~/    
-      - run: yum -y install tar gzip
-      - run: yum -y install tar gzip
-      - run: sudo apt-get install -y tar
+          at: ~/
       - run:    
           name: Install dependencies
           command: |
             # your code here
+            sudo apt-get install -y tar
             curl -sL https://rpm.nodesource.com/setup_lts.x | bash -
             yum -y install nodejs 
       - run:
@@ -352,8 +350,8 @@ jobs:
       # Add ssh keys with fingerprint
       - add_ssh_keys:
           fingerprints: ["a6:ac:72:3c:e9:8b:eb:a6:9f:a4:fb:ec:d3:35:98:86"]     
-      # attach workspace
-          at: /tmp/.circleci/ansible
+      - attach_workspace
+          at: .circleci/ansible/
       - run:
           name: Install dependencies
           command: |
