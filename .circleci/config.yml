@@ -334,7 +334,7 @@ jobs:
             cd frontend
             npm install
             npm run build
-            aws s3 cp ./dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
+            aws s3 cp ./dist s3://udapeople-<< pipeline.parameters.workflow-id >> --recursive
       # Here's where you will add some code to rollback on failure      
       - revert-migrations
       - destroy_environment
@@ -404,7 +404,7 @@ jobs:
           name: Frontend smoke test.
           command: |
             # your code here
-            URL="http://    << pipeline.parameters.workflow-id >>.s3-website-eu-east-1.amazonaws.com"
+            URL="http://    << pipeline.parameters.workflow-id >>.s3-website-us-east-1.amazonaws.com"
             echo $URL
             if curl -s ${URL} | grep "Welcome"
             then
@@ -445,7 +445,7 @@ jobs:
             aws cloudformation deploy \
             --template-file /root/project/.circleci/files/cloudfront.yml \
             --stack-name udapeople-cloudfront \
-            --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:7}" \
+            --parameter-overrides WorkflowID="<< pipeline.parameters.workflow-id >>" \
             --tags project=udapeople
             curl -H "Content-Type: text/plain" -H "token: OldWorkflowID-${CIRCLE_WORKFLOW_ID}" \
             --request PUT \
