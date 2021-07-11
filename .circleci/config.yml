@@ -305,21 +305,26 @@ jobs:
   deploy-frontend:
     docker:
       # Docker image here that supports AWS CLI
-      - image: amazon/aws-cli
+      #- image: amazon/aws-cli
+      - image: circleci/node:13.8.0
     steps:
       # Checkout code from git
       - checkout
+      - aws-cli/setup
       - attach_workspace:
           at: ~/
       - run:
           name: Install tar/gzip utility
           command: |
-            yum -y install tar    
+            yum -y install tar 
+            yum -y install tar gzip
+            sudo apt-get install -y tar
       - run:    
           name: Install dependencies
           command: |
             # your code here
             #sudo apt-get install -y tar
+            yum -y install tar gzip
             curl -sL https://rpm.nodesource.com/setup_lts.x | bash -
             yum -y install nodejs 
       - run:
