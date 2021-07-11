@@ -306,7 +306,7 @@ jobs:
     docker:
       # Docker image here that supports AWS CLI
       #- image: amazon/aws-cli
-      - image: circleci/node:13.8.0
+      - image: python:3.7-alpine3.11
     steps:
       # Checkout code from git
       - checkout
@@ -316,6 +316,9 @@ jobs:
       - run:
           name: Install tar/gzip utility
           command: |
+            apk add curl
+            apk add --update npm
+            pip3 install awscli          
             yum -y install tar 
             yum -y install tar gzip
             sudo apt-get install -y tar
