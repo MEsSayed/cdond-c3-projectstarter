@@ -311,11 +311,15 @@ jobs:
       - checkout
       - attach_workspace:
           at: ~/
+      - run:
+          name: Install tar/gzip utility
+          command: |
+            yum -y install tar    
       - run:    
           name: Install dependencies
           command: |
             # your code here
-            sudo apt-get install -y tar
+            #sudo apt-get install -y tar
             curl -sL https://rpm.nodesource.com/setup_lts.x | bash -
             yum -y install nodejs 
       - run:
