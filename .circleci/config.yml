@@ -305,31 +305,18 @@ jobs:
   deploy-frontend:
     docker:
       # Docker image here that supports AWS CLI
-      #- image: amazon/aws-cli
-      - image: python:3.7-alpine3.11
+      - image: amazon/aws-cli
     steps:
       # Checkout code from git
       - checkout
-      #- aws-cli/setup
-      - attach_workspace:
-          at: ~/
       - run:
-          name: Install tar/gzip utility
-          command: |
-            apk add curl
-            apk add --update npm
-            pip3 install awscli          
-            #yum -y install tar 
-            #yum -y install tar gzip
-            #sudo apt-get install -y tar
-      - run:    
           name: Install dependencies
           command: |
-            # your code here
-            #sudo apt-get install -y tar
-            #yum -y install tar gzip
             curl -sL https://rpm.nodesource.com/setup_lts.x | bash -
-            #yum -y install nodejs 
+            yum -y install nodejs
+            yum -y install tar gzip      
+      - attach_workspace:
+          at: ~/
       - run:
           name: Get backend url
           command: |
