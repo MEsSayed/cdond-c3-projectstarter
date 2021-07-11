@@ -316,30 +316,27 @@ jobs:
           command: |
             # your code here
             cd frontend
-            sudo npm install webpack-dev-server -g
-            sudo npm install
+            yum -y install tar gzip 
+            curl -sL https://rpm.nodesource.com/setup_lts.x | bash -
+            yum -y install nodejs 
       - run:
           name: Get backend url
           command: |
             # your code here
-            export BACKEND_IP=$(sed -n 2p .circleci/ansible/inventory.txt)
+            BACKEND_IP=$(curl -H "token: IP-${CIRCLE_WORKFLOW_ID:0:9}" \
+                        --request GET https://api.memstash.io/values/IP)
             export API_URL="http://${BACKEND_IP}:3030"
-            echo ENVIRONMENT=production > "frontend/.env"
-            echo NODE_ENV=production >> "frontend/.env"
-            echo API_URL=$API_URL >> "frontend/.env"
-            echo $API_URL  
-      - run:
-          name: Build frontend
-          command: |
-            cd frontend
-            ls -la
-            cat .env
-            npm run build
+            echo API_URL="http://${BACKEND_IP}:3030" >> "frontend/.env"
+            echo "${API_URL}"
       - run:
           name: Deploy frontend objects
           command: |
             # your code here
-            aws s3 cp --recursive frontend/dist "s3://udapeople-<< pipeline.parameters.workflow-id >>"
+            npm install webpack-dev-server -g
+            cd frontend
+            npm install
+            npm run build
+            aws s3 cp ./dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
       # Here's where you will add some code to rollback on failure      
       - revert-migrations
       - destroy_environment
@@ -360,25 +357,20 @@ jobs:
           name: Install dependencies
           command: |
             # your code here
-            apk add --update ansible openssh-client tar gzip
+            apk add --update ansible
+            apk add --update tar gzip curl
+            apk add --update openssh-client
       - run:
           name: Deploy backend
           command: |
             # your code here
-            cd backend
-            tar czf backend.tar.gz -P            
+            tar -C backend -czvf artifact.tar.gz .
+            ls -la           
       - run:
           name: Deploy backend 2
           command: |
             export ANSIBLE_HOST_KEY_CHECKING=False
-            ansible-playbook \
-              -i .circleci/ansible/inventory.txt \
-              .circleci/ansible/deploy-backend.yml
-      - run:
-          name: Install AWS CLI for rollback
-          when: on_fail
-          command: |
-            apk add --update py3-pip && pip3 install --upgrade pip && pip3 install awscli              
+            ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i /tmp/.circleci/ansible/inventory.txt .circleci/ansible/deploy-backend.yml           
       # Here's where you will add some code to rollback on failure  
       - revert-migrations      
       - destroy_environment
