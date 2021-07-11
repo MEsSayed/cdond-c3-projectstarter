@@ -11,7 +11,7 @@
   roles:
     - configure-prometheus-node-exporter
     - configure-server
-    - deploy-backend
+    - deploy
   environment:
       TYPEORM_CONNECTION: "{{ lookup('env','TYPEORM_CONNECTION') }}"
       TYPEORM_HOST: "{{ lookup('env','TYPEORM_HOST') }}"
