@@ -389,12 +389,12 @@ jobs:
           name: Get backend url
           command: |
             # your code here
-            #export BACKEND_URL=$(sed -n 2p .circleci/ansible/inventory.txt)
+            export BACKEND_URL=$(sed -n 2p .circleci/ansible/inventory.txt)
       - run:
           name: Backend smoke test.
           command: |
             # your code here
-            if curl -s https://${BACKEND_URL}:3030/api/status
+            if curl -s https://${BACKEND-URL}:3030/api/status
             then
             return 1
             else
@@ -404,7 +404,7 @@ jobs:
           name: Frontend smoke test.
           command: |
             # your code here
-            URL="http://    << pipeline.parameters.workflow-id >>.s3-website-eu-east-1.amazonaws.com"
+            URL="http://    << pipeline.parameters.workflow_id >>.s3-website-eu-east-1.amazonaws.com"
             echo $URL
             if curl -s ${URL} | grep "Welcome"
             then
@@ -418,7 +418,7 @@ jobs:
   cloudfront-update:
     docker:
       # Docker image here that supports AWS CLI
-      - image: python:3.7-alpine3.11
+      - image: amazon/aws-cli
     steps:
       # Checkout code from git
       - checkout
@@ -426,18 +426,32 @@ jobs:
           name: Install dependencies
           command: |
             # your code here
-            apk add --update py3-pip && pip3 install --upgrade pip && pip3 install awscli
-            apk add --update curl
+            yum -y install tar gzip
       - run:
           name: Update cloudfront distribution
           command: |
             # your code here
+            export OldWorkflowID=$(aws cloudformation list-exports \
+            --query "Exports[?Name==\`WorkflowID\`].Value" \
+            --no-paginate --output text)
+            
+            export STACKS=$(aws cloudformation list-stacks \
+            --query "StackSummaries[*].StackName" \
+            --stack-status-filter CREATE_COMPLETE \
+            --no-paginate --output text)
+            
+            echo OldWorkflowID: "$OldWorkflowID"
+            echo STACKS: "$STACKS" 
             aws cloudformation deploy \
-              --template-file .circleci/files/cloudfront.yml \
-              --stack-name "udapeople-cloudfront" \
-              --parameter-overrides WorkflowID="<< pipeline.parameters.workflow-id >>" \
-              --tags project=udapeople            
+            --template-file /root/project/.circleci/files/cloudfront.yml \
+            --stack-name udapeople-cloudfront \
+            --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:7}" \
+            --tags project=udapeople
+            curl -H "Content-Type: text/plain" -H "token: OldWorkflowID-${CIRCLE_WORKFLOW_ID}" \
+            --request PUT \
+            --data "$OldWorkflowID" https://api.memstash.io/values/OldWorkflowID           
       # Here's where you will add some code to rollback on failure  
+      - revert-migrations
       - destroy_environment
           
   cleanup:
