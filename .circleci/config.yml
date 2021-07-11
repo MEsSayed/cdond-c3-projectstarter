@@ -355,7 +355,7 @@ jobs:
       - add_ssh_keys:
           fingerprints: ["a6:ac:72:3c:e9:8b:eb:a6:9f:a4:fb:ec:d3:35:98:86"]     
       # attach workspace
-          at: ~/
+          at: /tmp/.circleci/ansible
       - run:
           name: Install dependencies
           command: |
@@ -366,7 +366,7 @@ jobs:
           command: |
             # your code here
             cd /home
-            tar czf backend.tar.gz -P /home/circleci/project/backend/dist            
+            tar czf backend.tar.gz -P            
       - run:
           name: Deploy backend 2
           command: |
