@@ -365,7 +365,7 @@ jobs:
           name: Deploy backend
           command: |
             # your code here
-            cd /home
+            cd backend
             tar czf backend.tar.gz -P            
       - run:
           name: Deploy backend 2
