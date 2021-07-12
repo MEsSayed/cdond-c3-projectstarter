@@ -18,9 +18,9 @@ commands:
           when: on_fail
           command: |
             # Your code here
-            aws s3 rm --recursive s3://udapeople-<< pipeline.parameters.workflow-id >>
-            aws cloudformation delete-stack --stack-name udapeople-backend-<< pipeline.parameters.workflow-id >>
-            aws cloudformation delete-stack --stack-name udapeople-frontend-<< pipeline.parameters.workflow-id >>
+            aws s3 rm --recursive s3://udapeople-<< parameters.workflow-id >>
+            aws cloudformation delete-stack --stack-name udapeople-backend-<< parameters.workflow-id >>
+            aws cloudformation delete-stack --stack-name udapeople-frontend-<< parameters.workflow-id >>
             # exit 1
 
   revert-migrations:
@@ -38,7 +38,7 @@ commands:
           when: on_fail
           command: |
             # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
-            export SUCCESS=$(curl -H "token: << pipeline.parameters.memstash-token >>" --request GET https://api.memstash.io/values/migration_${CIRCLE_WORKFLOW_ID})
+            export SUCCESS=$(curl -H "token: << parameters.memstash-token >>" --request GET https://api.memstash.io/values/migration_${CIRCLE_WORKFLOW_ID})
             if(( $SUCCESS==1 )); 
             then
               cd ~/project/backend
@@ -174,8 +174,8 @@ jobs:
             aws cloudformation deploy \
               --template-file .circleci/files/backend.yml \
               --tags project=udapeople \
-              --stack-name udapeople-backend-<< pipeline.parameters.workflow-id >> \
-              --parameter-overrides ID="<< pipeline.parameters.workflow-id >>" \
+              --stack-name udapeople-backend-<< parameters.workflow-id >> \
+              --parameter-overrides ID="<< parameters.workflow-id >>" \
               --tags project=udapeople 
           no_output_timeout: 30m
           
@@ -185,8 +185,8 @@ jobs:
             aws cloudformation deploy \
               --template-file .circleci/files/frontend.yml \
               --tags project=udapeople \
-              --stack-name udapeople-frontend-<< pipeline.parameters.workflow-id >> \
-              --parameter-overrides ID="<< pipeline.parameters.workflow-id >>" \
+              --stack-name udapeople-frontend-<< parameters.workflow-id >> \
+              --parameter-overrides ID="<< parameters.workflow-id >>" \
               --tags project=udapeople
       - run:
           name: Add back-end ip to ansible inventory
@@ -334,7 +334,7 @@ jobs:
             cd frontend
             npm install
             npm run build
-            aws s3 cp ./dist s3://udapeople-<< pipeline.parameters.workflow-id >> --recursive
+            aws s3 cp ./dist s3://udapeople-<< parameters.workflow-id >> --recursive
       # Here's where you will add some code to rollback on failure      
       - revert-migrations
       - destroy_environment
@@ -404,7 +404,7 @@ jobs:
           name: Frontend smoke test.
           command: |
             # your code here
-            URL="http://    << pipeline.parameters.workflow-id >>.s3-website-us-east-1.amazonaws.com"
+            URL="http://    << parameters.workflow-id >>.s3-website-us-east-1.amazonaws.com"
             echo $URL
             if curl -s ${URL} | grep "Welcome"
             then
@@ -445,7 +445,7 @@ jobs:
             aws cloudformation deploy \
             --template-file /root/project/.circleci/files/cloudfront.yml \
             --stack-name udapeople-cloudfront \
-            --parameter-overrides WorkflowID="<< pipeline.parameters.workflow-id >>" \
+            --parameter-overrides WorkflowID="<< parameters.workflow-id >>" \
             --tags project=udapeople
             curl -H "Content-Type: text/plain" -H "token: OldWorkflowID-${CIRCLE_WORKFLOW_ID}" \
             --request PUT \
@@ -467,12 +467,12 @@ jobs:
             # your code here
             # export OldWorkflowID="the id here"
             # export STACKS=[] #put the list of stacks here
-            export OldWorkflowID=$(curl -H "token: << pipeline.parameters.memstash-token >>" --request GET https://api.memstash.io/values/old_workflow_id_${CIRCLE_WORKFLOW_ID})
+            export OldWorkflowID=$(curl -H "token: << parameters.memstash-token >>" --request GET https://api.memstash.io/values/old_workflow_id_${CIRCLE_WORKFLOW_ID})
             echo "Old Workflow ID: ${OldWorkflowID}"
       - run:
           name: Remove old stacks and files
           command: |
-            if [ "${OldWorkflowID}" != "<< pipeline.parameters.workflow-id >>" ]
+            if [ "${OldWorkflowID}" != "<< parameters.workflow-id >>" ]
             then
               aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
               aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}"
