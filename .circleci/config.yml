@@ -12,13 +12,15 @@ parameters:
 commands:
   destroy_environment:
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.       
+    docker:
+      - image: circleci/node:13.8.0
     steps:
       - run:
           name: Destroy environments
           command: |
-            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-            unzip awscliv2.zip
-            ./aws/install
+            #curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            #unzip awscliv2.zip
+            #./aws/install
             # Your code here
             aws s3 rm --recursive s3://udapeople-<< pipeline.parameters.workflow-id >>
             aws cloudformation delete-stack --stack-name udapeople-backend-<< pipeline.parameters.workflow-id >>
