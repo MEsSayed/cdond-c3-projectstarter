@@ -161,7 +161,6 @@ jobs:
           name: Scan backend dependencies
           command: |
             cd backend
-            cd back
             npm install
             npm audit --audit-level=critical || true
             
