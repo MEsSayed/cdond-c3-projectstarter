@@ -11,3 +11,6 @@ http://udapeople-8c92836.s3-website-us-east-1.amazonaws.com
 
 URL04
 ec2-3-91-69-192.compute-1.amazonaws.com
+
+URL05
+http://ec2-54-234-254-32.compute-1.amazonaws.com:9090/alerts
