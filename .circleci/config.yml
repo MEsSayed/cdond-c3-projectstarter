@@ -144,7 +144,8 @@ jobs:
           command: |
             cd frontend
             npm install
-            npm audit --audit-level=critical || true     
+            #npm audit --audit-level=critical || true
+            npm audit fix --audit-level=critical --force    
       
   scan-backend:
     docker:
@@ -162,7 +163,8 @@ jobs:
           command: |
             cd backend
             npm install
-            npm audit --audit-level=critical || true
+            #npm audit --audit-level=critical || true
+            npm audit fix --audit-level=critical --force
             
   deploy-infrastructure:
     docker:
@@ -339,6 +341,7 @@ jobs:
             npm install
             npm run build
             aws s3 cp ./dist s3://udapeople-<< pipeline.parameters.workflow-id >> --recursive
+            npm run build
       # Here's where you will add some code to rollback on failure      
       - revert-migrations
       - destroy_environment
