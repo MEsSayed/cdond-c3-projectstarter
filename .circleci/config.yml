@@ -206,11 +206,11 @@ jobs:
           no_output_timeout: 30m
           
       - persist_to_workspace:
-          root: .circleci/ansible
+          root: ~/
           paths:
-            - inventory.txt
-      - attach_workspace:
-          at: .circleci/ansible/
+            - project/.circleci/ansible/inventory.txt
+      #- attach_workspace:
+      #    at: .circleci/ansible/
       # Here's where you will add some code to rollback on failure      
       - destroy_environment       
 
@@ -327,8 +327,8 @@ jobs:
           name: Get backend url
           command: |
             # your code here
-            #export BACKEND_IP=$(sed -n 2p .circleci/ansible/inventory.txt)
-            #export API_URL="http://${BACKEND_IP}:3030"
+            export BACKEND_IP=$(sed -n 2p .circleci/ansible/inventory.txt)
+            export API_URL="http://${BACKEND_IP}:3030"
             #echo ENVIRONMENT=production > "frontend/.env"
             #echo NODE_ENV=production >> "frontend/.env"
             #echo API_URL=$API_URL >> "frontend/.env"            
@@ -337,11 +337,13 @@ jobs:
             #export API_URL="http://${BACKEND_IP}:3030"
             #echo API_URL="http://${BACKEND_IP}:3030" >> "frontend/.env"
             #echo "${API_URL}"
-            export API_URL=`cat .circleci/outputs/backend_url.txt`
-            echo "API_URL: $API_URL"
-            export API_URL="http://${BACKEND_IP}:3030"
-            echo API_URL="http://${BACKEND_IP}:3030" >> "frontend/.env"
+            #export API_URL=`cat .circleci/outputs/backend_url.txt`
+            #echo "API_URL: $API_URL"
+            #export API_URL="http://${BACKEND_IP}:3030"
+            #echo API_URL="http://${BACKEND_IP}:3030" >> "frontend/.env"
             echo "${API_URL}"
+            echo $API_URL > ~/api_url.txt
+            echo "API_URL=${API_URL}" >> frontend/.env            
       - run:
           name: Deploy frontend objects
           command: |
