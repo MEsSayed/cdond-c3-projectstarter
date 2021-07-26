@@ -1,0 +1,17 @@
+URL01
+https://github.com/MEsSayed/cdond-c3-projectstarter
+
+URL02
+S3 
+http://udapeople-ac83571.s3-website-us-east-1.amazonaws.com
+
+URL03
+frontend (hosted on S3)
+http://d1fo9ah8tfl48n.cloudfront.net/#/employees
+
+URL04
+http://ec2-52-90-98-42.compute-1.amazonaws.com:3030/
+
+URL05
+http://ec2-54-164-47-128.compute-1.amazonaws.com:9090/targets
+http://ec2-54-164-47-128.compute-1.amazonaws.com:9090/alerts
